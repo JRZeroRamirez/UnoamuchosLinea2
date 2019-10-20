@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <p:panelGrid columns="2">
+            <h:form id="uniForm" enctype="multipart/form-data">
+                <p:growl id="uniGr" showDetail="true" />
+                <p:panel header="Registro Universidades">
+                    <p:panelGrid columns="2">
+                        <h:outputLabel value="Nombre" for="uniNom" />
+                        <p:inputText id="uniNom" value="#{indexController.nombreU}" />
+                        <h:outputLabel value="Extensión" for="uniExt" />
+                        <p:inputText id="uniExt" value="#{indexController.extensionU}" />
+                        <h:outputLabel value="Fecha Fundación" for="uniFF" />
+                        <p:datePicker id="uniFF" value="#{indexController.fechaFundacion}" monthNavigator="true" pattern="dd/MM/yyyy" yearNavigator="true" yearRange="1500:2019">
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:datePicker>
+                        <h:outputLabel value="Logo Universidad" for="uniLogo" />
+                        <p:fileUpload id="uniLogo" mode="advanced" update=":uniForm:uniGr" fileUploadListener="#{indexController.handleFileUpload}" auto="true" sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+                    </p:panelGrid>
+                    <p:commandButton value="Guardar" update=":uniForm, dipForm:universidades, :dts:uni" action="#{indexController.guardarUniversidad()}"/>
+                </p:panel>
+            </h:form>
+
+            <h:form id="dipForm">
+                <p:messages id="sms" showDetail="true"/>
+                <p:panel header="Registro Diplomado">
+                    <p:panelGrid columns="2">
+                        <h:outputLabel value="Titulo" for="tituloDip" />
+                        <p:inputText id="tituloDip" value="#{indexController.tituloD}" required="true" />
+                        <h:outputLabel value="Descripción" for="descDip" />
+                        <p:inputText id="descDip" value="#{indexController.descripcionD}" required="true" />
+                        <h:outputLabel value="Fecha Inicio" for="dipFi" />
+                        <p:datePicker id="dipFi" value="#{indexController.fechaInicioD}" monthNavigator="true" pattern="dd/MM/yyyy" yearNavigator="true" yearRange="2019:2020"  required="true">
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:datePicker>
+                        <h:outputLabel value="Fecha Fin" for="dipFF" />
+                        <p:datePicker id="dipFF" value="#{indexController.fechaFinD}" monthNavigator="true" pattern="dd/MM/yyyy" yearNavigator="true" yearRange="2019:2022" required="true">
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:datePicker>                       
+                        <p:outputLabel value="Universidad:" for="universidades" />
+                        <p:selectOneMenu id="universidades" value="#{indexController.universidadSeleccionada}" dynamic="true" style="width:225px" required="true">
+                            <f:selectItem itemLabel="Elija una Universidad" itemValue="" />
+                            <f:selectItems var="univ" value="#{indexController.listaUniversidades}" itemLabel="#{univ.nombre}" itemValue="#{univ.id}" />
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+
+
+                    <p:commandButton value="Guardar" update=":dipForm:sms, :estForm:diplomados, :dts:dip" action="#{indexController.guardarDiplomado()}"/>
+                </p:panel>
+            </h:form>
+
+            <h:form id="estForm">
+                <p:messages id="sms" showDetail="true" />
+                <p:panel header="Registro Estudiante">
+                    <p:panelGrid columns="2">
+                        <h:outputLabel value="Nombre" for="nomEst" />
+                        <p:inputText id="nomEst" value="#{indexController.nombreE}" />
+                        <h:outputLabel value="Edad" for="edadEst" />
+                        <p:inputText id="edadEst" value="#{indexController.edadE}" />
+                        <h:outputLabel value="Foto Estudiante" for="fotoEst" />
+                        <p:fileUpload id="fotoEst" mode="advanced" auto="true" fileUploadListener="#{indexController.handleFileUpload}" sizeLimit="100000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+                        <p:outputLabel value="Diplomado:" for="diplomados" />
+                        <p:selectOneMenu id="diplomados" value="#{indexController.diplomadoSeleccionado}" dynamic="true" style="width:225px" required="true">
+                            <f:selectItem itemLabel="Elija un Diplomado" itemValue="" />
+                            <f:selectItems var="dip" value="#{indexController.listaDiplomados}" itemLabel="#{dip.nombre}" itemValue="#{dip.id}" />
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    <p:commandButton value="Guardar" update=":estForm:sms, :dts:est, :dtVista:vista" action="#{indexController.guardarEstudiante()}"/>
+                </p:panel>
+            </h:form>
+        </p:panelGrid>
+        <h:form id="dts">
+            <p:panelGrid columns="3">
+                <p:dataTable id="uni" var="uni" value="#{indexController.listaUniversidades}">
+                    <f:facet name="header">
+                        Listado de Universidades
+                    </f:facet>
+                    <p:column headerText="Id" style="display: none">
+                        <h:outputText value="#{uni.id}" />
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{uni.nombre}" />
+                    </p:column>
+                    <p:column headerText="Extensión">
+                        <h:outputText value="#{uni.extension}" />
+                    </p:column>
+                    <p:column headerText="Foto">
+                        <p:graphicImage name="#{uni.escudo}" width="50px" />
+                    </p:column>
+                </p:dataTable>
+
+                <p:dataTable id="dip" var="dip" value="#{indexController.listaDiplomados}">
+                    <f:facet name="header">
+                        Listado de Diplomados
+                    </f:facet>
+                    <p:column headerText="Id" style="display: none">
+                        <h:outputText value="#{dip.id}" />
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{dip.nombre}" />
+                    </p:column>
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{dip.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Inicio - fin">
+                        <h:outputText value="#{dip.fechaInicio}" >
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText> - 
+                        <h:outputText value="#{dip.fechaFin}" >
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:dataTable id="est" var="est" value="#{indexController.listaEstudiantes}">
+                    <f:facet name="header">
+                        Listado de Estudiantes
+                    </f:facet>
+                    <p:column headerText="Id" style="display: none">
+                        <h:outputText value="#{est.id}" />
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{est.nombre}" />
+                    </p:column>
+                    <p:column headerText="Edad">
+                        <h:outputText value="#{est.edad}" />
+                    </p:column>
+                    <p:column headerText="Foto">
+                        <p:graphicImage name="#{est.foto}" width="50px" />
+                    </p:column>
+                </p:dataTable>
+            </p:panelGrid>
+        </h:form>
+        <h:form id="dtVista">
+            <p:panelGrid columns="3">
+                <p:dataTable id="vista" var="vist" value="#{indexController.listaVista}">
+                    <f:facet name="header">
+                        Listado En Relacion Total
+                    </f:facet>
+                    <p:column headerText="Universidad">
+                        <h:outputText value="#{vist.universidad}" />
+                    </p:column>
+                    <p:column headerText="Extensión">
+                        <h:outputText value="#{vist.extension}" />
+                    </p:column>
+                    <p:column headerText="Diplomado">
+                        <h:outputText value="#{vist.diplomado}" />
+                    </p:column>
+                    <p:column headerText="Inicio - Fin">
+                        <h:outputText value="#{vist.fehcaI}" >
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText> - 
+                        <h:outputText value="#{vist.fechaF}" >
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Estudiante">
+                        <h:outputText value="#{vist.estudiante}" />
+                    </p:column>
+                    <p:column headerText="Foto">
+                        <p:graphicImage name="#{vist.foto}" width="50px" />
+                    </p:column>
+                </p:dataTable>
+            </p:panelGrid>
+        </h:form>
+    </h:body>
+</html>
+
